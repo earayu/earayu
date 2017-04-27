@@ -3,6 +3,10 @@ title: To Do List of earayu&anjie
 updated: 2017-04-27 10:17
 ---
 
+
+- [ ] get high
+- [x] get high
+
 ### *To Do List of earayu&anjie* 
 
 1. - [ ] 游乐园
