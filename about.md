@@ -5,6 +5,9 @@ title: About
 
 Hello.
 
-This will be your About page. Anything about you, it should be written here in details. You may describe your bio here like who you are, what you do, your intention, social site hyperlinks and how people can contact you, etc.
+我是earayu, 后台开发. 会一点Python和Java.
 
-**Less is more..**
+<div align = right>📧:[earayu@163.com](mailto:earayu@163.com)</div>
+
+<div align = right>:cafe::[https://github.com/earayu](https://github.com/earayu)</div>
+
