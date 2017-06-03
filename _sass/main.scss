@@ -121,8 +121,12 @@ iframe {
 }
 ul,
 ol {
+  /*
   margin: 40px 0;
   padding-left: 50px;
+  */
+  margin: 10px 0;
+  padding-left: 15px;
   li {
     word-wrap: break-word;
   }
