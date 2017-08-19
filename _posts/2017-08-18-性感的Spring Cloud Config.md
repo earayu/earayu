@@ -122,6 +122,7 @@ endpoints:
 * Git本身也有hook机制，但它只支持`pre-push`而没有`post-push`。但是我们需要在`push`完成后调用`/refresh`才有用怎么办？可以使用装饰器模式，在`pre-push脚本`中将`pre-push脚本`、`git push`、`post-push脚本`包装进去。详情见[这里](https://stackoverflow.com/questions/1797074/local-executing-hook-after-a-git-push)
 * 其他各种实现。我们厂里提供了一个`maven插件`来提交配置文件，使用起来就像这样：`mvn [插件名]:conf -Denv=[dev|test|prd]`。它内部做的也仅仅就是提交一下配置文件到服务器而已。完全可以在代码逻辑中加入调用`/refresh`的功能。
 * SVN等各种版本控制工具也有hook机制。
+* 配合Spring Cloud Bus的`/bus/refresh`
 
 
 
