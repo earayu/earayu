@@ -102,17 +102,23 @@ public class ConfigclientApplication {
 
 
 
->Spring Boot Actuator的/refresh接口默认是不提供出来的，你可以这样来打开它：
->
->```yaml
->management:
->  security:
->    enabled: false
->
->endpoints:
->  refresh:
->    enabled: true
->```
+Spring Boot Actuator的/refresh接口默认是不提供出来的，你可以这样来打开它：
+
+```yaml
+management:
+  security:
+    enabled: false
+
+endpoints:
+  refresh:
+    enabled: true
+```
+
+
+
+TODO HOOK
+
+
 
 #### 高可用
 
@@ -122,3 +128,6 @@ TODO
 
 
 
+```
+
+```
