@@ -141,7 +141,7 @@ public Environment findOne(String application, String profile, String label) {
 
 1. 创建一个`NativeEnvironmentRepository`实例。
 2. 从远程仓库同步数据到本地，然后返回本地仓库的地址
-3.  读取本地git仓库的配置，返回`Environment`对象
+3. 读取本地git仓库的配置，返回`Environment`对象
 4. 一些后置处理
 
 ```java
@@ -234,30 +234,3 @@ public Environment findOne(String config, String profile, String label) {
 
 
 以上就是Spring Cloud Config 服务端的主要流程。
-
-
-
-
-
-
-
-
-
-
-
-
-
-在`spring-cloud-config-server`的依赖中，我们可以看到有`JGit`和`SVNKit`的存在。这在我们的预料之中，因为如之前文章所说，config server要从远程仓库先把配置文件克隆到本地后，再从本地仓库加载。
-
-```xml
-<dependency>
-	<groupId>org.eclipse.jgit</groupId>
-	<artifactId>org.eclipse.jgit</artifactId>
-</dependency>
-<dependency>
-	<groupId>org.tmatesoft.svnkit</groupId>
-	<artifactId>svnkit</artifactId>
-	<optional>true</optional>
-</dependency>
-```
-
