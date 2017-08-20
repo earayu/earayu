@@ -5,7 +5,7 @@ updated: 2017-08-18 01:15
 
 ## 性感的 Spring Cloud Config
 
->本文覆盖spring cloud config的基本使用、高可用方案；以及一些我遇到过的小坑。
+>本文覆盖spring cloud config的必要说明、基本使用、动态配置、高可用方案；以及一些我遇到过的小坑。
 >
 >配合[这个](https://github.com/earayu/configserver)食用，风味更佳。
 
@@ -118,7 +118,11 @@ public class ConfigclientApplication {
 
 TODO
 
+#### 其他
 
+其他Spring Cloud Config的文章：
+
+源码和内部原理部分，接下来几篇博客会推出。
 
 
 
