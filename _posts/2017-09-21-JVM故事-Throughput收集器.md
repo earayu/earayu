@@ -1,2 +1,0 @@
-# Throughput收集器
-
