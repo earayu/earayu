@@ -80,6 +80,17 @@
     * 不属于任何其他对象的属性都属于它
   * Math对象
 
+* AJAX
+
+  * FormData
+  * 做法
+    * 检查状态码
+    * load事件
+    * 头部
+    * 异常处理
+    * 类型转换
+    * ​
+
 ## BOM
 
 * window
@@ -90,7 +101,7 @@
 
 * 选择符
   * querySelector()                           
-  *  querySelectorAll()
+  * querySelectorAll()
   * matchesSelector()
   * 操作className
     * classList
