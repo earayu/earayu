@@ -1,5 +1,5 @@
 ---
-title: ThreadLocal设计方案之我见
+title: ThreadLocal设计方案及最佳实践
 updated: 2018-01-23 01:15
 ---
 
