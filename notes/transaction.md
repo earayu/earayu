@@ -99,3 +99,15 @@ COMMIT;
 T1:
 SELECT * FROM xx;（查询结果没有id为3的行。说明，即使T1比T2先开始，T1读到的快照也是T2commit后的。）
 
+MVCC模式下什么时候建立快照？
+If the transaction isolation level is REPEATABLE READ (the default level), all consistent reads within the same transaction read the snapshot established by the first such read in that transaction.
+With READ COMMITTED isolation level, each consistent read within a transaction sets and reads its own fresh snapshot.
+
+所以，READ COMMITED隔离级别下会出现幻读。REPEATABLE READ隔离级别下不会出现幻读，但是会出现"幻写"，即写入时主键冲突。
+
+来源：https://dev.mysql.com/doc/refman/5.7/en/innodb-consistent-read.html
+
+
+## 文章
+
+[Spring五个事务隔离级别和七个事务传播行为](https://yq.aliyun.com/articles/48893)
