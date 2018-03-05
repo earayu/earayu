@@ -104,6 +104,8 @@ If the transaction isolation level is REPEATABLE READ (the default level), all c
 With READ COMMITTED isolation level, each consistent read within a transaction sets and reads its own fresh snapshot.
 
 所以，READ COMMITED隔离级别下会出现幻读。REPEATABLE READ隔离级别下不会出现幻读，但是会出现"幻写"，即写入时主键冲突。
+REPEATABLE READ隔离级别如果想查看到（其他事务提交的）最新数据，可以使用S锁：SELECT * FROM t FOR SHARE; 
+
 
 来源：https://dev.mysql.com/doc/refman/5.7/en/innodb-consistent-read.html
 
