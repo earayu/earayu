@@ -24,7 +24,7 @@
 
 2. 什么时候会加行锁（S锁和X锁）？
 
-   查询条件为唯一索引，并且查询结果唯一时使用行锁。
+   查询条件为唯一索引，并且查询结果唯一时使用行锁。否则，将使用`gap lock`或`next-key lock`
 
    参见[官方文档](https://dev.mysql.com/doc/refman/5.7/en/innodb-transaction-isolation-levels.html)： `locking depends on whether the statement uses a unique index with a unique search condition, or a range-type search condition.` 
 
@@ -39,9 +39,107 @@
 
    如果不在表上加意向锁，对表加锁的时候，都要去检查表中的某一行上是否加有行锁，多麻烦。
 
-4. 在X隔离级别下进行Y操作，会按什么顺序加哪些锁？
+4. 一共有哪些锁？
 
-5. ​
+   * S锁和X锁
+
+   * IS锁和IX锁
+
+   * record lock
+
+     锁住索引，而非记录本身，如果表上没有任何索引，那么innodb会在后台创建一个隐藏的聚集主键索引。阻塞insert、update、delete操作，可以进行基本的select操作。
+
+   * gap lock
+
+     范围型record lock。对RR级别以上有效。GAP锁的目的，是为了防止同一事务的两次当前读，出现幻读的情况。PS：间隙锁不互相排斥，可以2个间隙锁加在同一个间隙。所以为了防止插入导致幻读，引入了insert intention lock。
+
+     > 说明：假设c1不是索引，并且t没有主键
+     >
+     > SELECT c1 FROM t WHERE c1 = 10 FOR UPDATE
+     >
+     > InnoDB存储引擎会自动生成一个聚集索引，c1不是索引，所以会全表扫描。一开始会对所有聚集索引加X锁，并且所有间隙加上gap锁。然后因为mysql做了一些特殊的优化处理，会把不必要的X锁和所有gap锁都释放，最终锁住c1=10的这条。
+
+   * next-key lock
+
+     是record lock和gap lock的结合。锁住当前记录和该记录前后的gap。
+
+
+   * insert intention lock（插入意向锁）
+
+     插入意向锁时在插入行前设置的一种间隙锁。这个锁示意如果多个事务感兴趣的不是索引区间中的同一个位置，则事务在同一个索引区间插入不需要相互等待。假设有索引记录值为4和7的行。两个事务分别尝试插入5和6，分别用插入意向锁锁住4和7之间的间隙，然后再取得插入行的排它锁，但是锁相互不会冲突，因为插入行没有冲突。
+
+   * auto-inc lock
+
+   * Predicate Locks for Spatial Indexes
+
+     ##### 总结
+
+     锁兼容性矩阵，横向是已经持有的锁，纵向是正在请求的锁。
+
+     |                      | Gap  | Insert Intention | Record | Next-Key |
+     | -------------------- | ---- | ---------------- | ------ | -------- |
+     | **Gap**              | 兼容   | 兼容               | 兼容     | 兼容       |
+     | **Insert Intention** | `冲突` | 兼容               | 兼容     | `冲突`     |
+     | **Record**           | 兼容   | 兼容               | `冲突`   | `冲突`     |
+     | **Next-Key**         | 兼容   | 兼容               | `冲突`   | `冲突`     |
+
+     分析兼容矩阵可以得出如下几个结论：
+
+     - INSERT操作之间不会有冲突。
+     - GAP,Next-Key会阻止Insert。
+     - GAP和Record,Next-Key不会冲突
+     - Record和Record、Next-Key之间相互冲突。
+     - 已有的Insert锁不阻止任何准备加的锁。
+
+     参见[官方文档](https://dev.mysql.com/doc/refman/5.7/en/innodb-locking.html)
+
+     参见[这个特别好的博客](http://hedengcheng.com/?p=771)
+
+5. 如何分析一条SQL语句加了哪些锁？
+
+   分析一条SQL语句加了哪些锁时，首先要知道以下信息：
+
+   1. 当前隔离级别是什么？
+   2. 查询条件使用了什么索引？
+   3. 使用的是索引扫描还是全表扫描？
+
+   * Read Committed 级别
+
+     * 没有索引
+
+       全表X锁
+
+     * 非唯一索引
+
+       先对所有通过where字句过滤得到的（后简称过滤得到）索引加X锁，再对相应的聚集索引加X锁
+
+     * 唯一索引
+
+       先对过滤得到的唯一索引加X锁，再对聚集索引加X锁
+
+     * 聚集索引
+
+       对聚集索引加X锁
+
+   * Repeatable read 级别
+
+     * 没有索引
+
+       先全表X锁，聚集索引每个间隙都加GAP锁，然后对不满足过滤条件的提前释放锁（违反了2PL规则）。
+
+     * 非唯一索引
+
+       先对过滤得到的唯一索引加X锁，再对聚集索引加X锁，非唯一索引的间隙加gap锁
+
+     * 唯一索引
+
+       同RC。先对过滤得到的唯一索引加X锁，再对聚集索引加X锁
+
+     * 聚集索引
+
+       同RC。对聚集索引加X锁
+
+     ​
 
    ​
 
@@ -61,7 +159,29 @@
 
    innodb 只对读无锁，写操作仍是上锁的悲观并发控制，这也意味着，innodb 中只能见到因死锁和不变性约束而回滚，而见不到因为写冲突而回滚。
 
-4. MVCC的快照什么时候生成？
+4. 什么是快照读和当前读？
+
+   在MVCC并发控制中，读操作可以分成两类：快照读 (snapshot read)与当前读 (current read)。快照读，读取的是记录的可见版本 (有可能是历史版本)，不用加锁。当前读，读取的是记录的最新版本，并且，当前读返回的记录，都会加上锁，保证其他事务不会再并发修改这条记录。
+
+   > 快照读：
+   >
+   > select * from table where ?
+   >
+   > 当前读：
+   >
+   > select * from table where ? lock in share mode;
+   >
+   > select * from table where ? for update;
+   >
+   > insert into table values (…);
+   >
+   > update table set ? where ?;
+   >
+   > delete from table where ?;
+   >
+   > （修改操作会先在内部触发一起读）
+
+5. MVCC的快照什么时候生成？
 
    如果是Read Committed, 则每次读开始时建立新的快照。
 
@@ -82,8 +202,40 @@
    T1:
    SELECT * FROM xx;（查询结果没有id为3的行。说明，即使T1比T2先开始，T1读到的快照也是T2commit后的。）
 
-5. MVCC和乐观锁的区别是什么？
+6. MVCC和乐观锁的区别是什么？
 
+
+
+
+#### 名词解释
+
+* 聚集索引和辅助索引
+
+  https://dev.mysql.com/doc/refman/5.7/en/innodb-index-types.html
+
+* 2PL
+
+  锁操作分为两个阶段：加锁阶段与解锁阶段，并且保证加锁阶段与解锁阶段不相交。加锁阶段：只加锁，不放锁。解锁阶段：只放锁，不加锁。
+
+* RDBMS
+
+  关系型数据库管理系统
+
+
+
+#### 其他补充
+
+* mysql的RR可以避免幻读
+
+  http://wangxinchun.iteye.com/blog/2341296
+
+  http://hedengcheng.com/?p=771#_Toc374698318
+
+  https://www.cnblogs.com/zhoujinyi/p/3435982.html
+
+  但是还是会有幻写（我自己领悟的）
+
+  ​
 
 
 
