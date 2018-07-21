@@ -80,6 +80,13 @@
     * 不属于任何其他对象的属性都属于它
   * Math对象
 
+* JSON
+
+  * stringify()
+    * 序列化
+  * parse()
+    * 反序列化
+
 ## BOM
 
 * window
@@ -90,7 +97,7 @@
 
 * 选择符
   * querySelector()                           
-  *  querySelectorAll()
+  * querySelectorAll()
   * matchesSelector()
   * 操作className
     * classList
@@ -112,4 +119,14 @@
   * 鼠标与滚轮事件
     * click	dbclick		mousedown          ....
   * 键盘事件
+* ​
+
+## 表单
+
+* HTMLFormElement类型
+* 提交
+  * input               button                图片
+* 文本框脚本
+* 选择框脚本
+* 表单序列化
 * ​
