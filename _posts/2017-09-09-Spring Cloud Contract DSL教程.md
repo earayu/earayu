@@ -7,9 +7,6 @@ updated: 2017-09-09 16:49
 
 `Contract DSL`是以`groovy`语言定义的`DSL`，但使用的时候不需要了解太多`groovy`知识，因为只使用了`groovy`非常小一部分的语言特性。它分为HTTP类型的DSL和Message类型的DSL。
 
-## Groovy介绍
-
-TODO
 
 ## DSL顶层元素
 
@@ -208,15 +205,9 @@ response {
 
 ```
 
-## 动态执行方法
-
-既然能动态生成参数，那就一定能执行方法咯？
-
-TODO
 
 ## 异步回调
 
-TODO
 
 ```
 org.springframework.cloud.contract.spec.Contract.make {
