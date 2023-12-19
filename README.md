@@ -18,3 +18,5 @@ I Lead the design and implementation of the [DDL execution engine](https://githu
 
 Before that, I was a web backend developer specializing in data-intensive applications. <br />
 The experience I gained in both database kernel development and application development has greatly enhanced my architectural design skills.
+
+[![earayu's GitHub stats](https://github-readme-stats.vercel.app/api?username=earayu&?count_private=true&show_icons=true&show_owner=true)](https://github.com/anuraghazra/github-readme-stats)
